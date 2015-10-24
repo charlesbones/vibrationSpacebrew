@@ -1,0 +1,73 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>vibration test</title>
+  <meta name="description" content="vibration test">
+  <meta name="author" content="Charles Bones">
+  <script type="text/javascript" src="js/jq.js"></script>
+<script type="text/javascript" src="js/sb-1.4.1.js"></script>
+  <script type="text/javascript">
+
+  $(window).on("load", setup);
+
+  // Spacebrew Object
+  var sb
+    , app_name = "vibration"
+    ;
+
+  /**
+     * setup Configure spacebrew connection and adds the mousedown listener.
+     */
+  function setup (){
+    var random_id = "0000" + Math.floor(Math.random() * 10000)
+      ;
+
+    app_name = app_name + ' ' + random_id.substring(random_id.length-4);
+
+    // create spacebrew client object
+    sb = new Spacebrew.Client({reconnect:true});
+
+    // set the base description
+    sb.name(app_name);
+    sb.description("This spacebrew client vibrates when someone sends some data");
+
+    // configure the publication and subscription feeds
+    sb.addSubscribe( "toggle", "boolean" );
+
+    // override Spacebrew events - this is how you catch events coming from Spacebrew
+    sb.onBooleanMessage = onBooleanMessage;
+    sb.onOpen = onOpen;
+
+    // connect to spacbrew
+    sb.connect();
+  }
+  function onOpen() {
+    var message = "Connected as <strong>" + sb.name() + "</strong>. ";
+    if (sb.name() === app_name) {
+      message += "<br>let's vibrate <strong>name=your_app_name</strong>."
+    }
+    $("#name").html( message );
+  }
+  function onBooleanMessage( name, value ){
+    console.log("[onBooleanMessage] boolean message received ", value);
+    if (value) {
+      navigator.vibrate(500);
+    } else {
+      navigator.vibrate([]);
+    }
+  }
+  </script>
+  <!--<link rel="stylesheet" href="css/styles.css?v=1.0">
+
+  [if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+  <!--<script src="js/scripts.js"></script>-->
+</body>
+</html>
